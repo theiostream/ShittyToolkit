@@ -1,13 +1,19 @@
 /*
 Code by abart997
 Working better thanks to theiostream (prefs + nonstop timer)
-This code is freaking /ugly/ because even if you disable seconds, that timer will keep running/repeating.
+Ugly, but works. (also less ugly than my first version was) -- check commit history
 Still, it shouldn't get so much of your memory as it is only executed while on the LockScreen
 */
+
+// TODO: fix mem leaks on dateTimer and userInfo
+// although it shouldn't get so much mem as it's lockscreen only. it also deallocs most stuff.
+// message me your contributions, and also any other mem leak that you find.
 
 #import <UIKit/UIKit.h>
 #import <objc/runtime.h>
 
+static NSMutableDictionary *plist = nil;
+static NSDateFormatter *dt = nil;
 
 @interface TPLCDTextView : UIView { }
 -(void)setText:(id)text;
@@ -20,31 +26,44 @@ static NSInteger clockColor;
 %hook SBAwayDateView
 - (id)initWithFrame:(CGRect)frame {
 	if ((self = %orig)) {
-		NSTimer *dateTimer = MSHookIvar<NSTimer *>(self, "_dateTimer");
-		id userInfo = [[dateTimer userInfo] copy];
-		[dateTimer invalidate];
-		[dateTimer release];
-		dateTimer = [NSTimer scheduledTimerWithTimeInterval:1 target:self selector:@selector(updateClock) userInfo:userInfo repeats:YES];
+		if (!plist)
+			plist = [[NSMutableDictionary alloc] initWithContentsOfFile:@"/var/mobile/Library/Preferences/com.abart997.clockseconds.plist"];
+		
+		if ([[plist objectForKey:@"SecondsEnabled"] boolValue]) {
+			NSTimer *dateTimer = MSHookIvar<NSTimer *>(self, "_dateTimer");
+			id userInfo = [[dateTimer userInfo] copy];
+			[dateTimer invalidate];
+			[dateTimer release];
+			dateTimer = [NSTimer scheduledTimerWithTimeInterval:1 target:self selector:@selector(updateClock) userInfo:userInfo repeats:YES];
+		}
 	}
 	return self;
 }
 
 -(void)updateClock{
-	NSMutableDictionary *plist = [[NSMutableDictionary alloc] initWithContentsOfFile:@"/var/mobile/Library/Preferences/com.abart997.clockseconds.plist"];
 	clockColor = [[(NSNumber*)plist valueForKey:@"clockColor"] integerValue];
 
 	%orig;
 	
+	if (![[plist objectForKey:@"SecondsEnabled"] boolValue])
+		return;
+	
 	TPLCDTextView *time = MSHookIvar<TPLCDTextView *>(self, "_timeLabel");
 	
-	NSDateFormatter *dt = [[NSDateFormatter alloc] init];
+	if (dt==nil) {
+		dt = [[NSDateFormatter alloc] init];
+	}
 	[dt setDateStyle:NSDateFormatterNoStyle];
 	[dt setTimeStyle:NSDateFormatterShortStyle];
 	[dt setDateFormat:@"HH:mm:ss"];
 	
-	![[plist objectForKey:@"SecondsEnabled"] boolValue] ? NSLog(@"Bozo!") : [time setText:[dt stringFromDate:[NSDate date]]];
-	![[plist objectForKey:@"ColorEnabled"] boolValue] ? NSLog(@"Again, Bozo!") : [time setTextColor: [self grabPrefColor:clockColor]];
+	![[plist objectForKey:@"SecondsEnabled"] boolValue] ? NSLog(@"test") : [time setText:[dt stringFromDate:[NSDate date]]];
+	![[plist objectForKey:@"ColorEnabled"] boolValue] ? NSLog(@"test") : [time setTextColor: [self grabPrefColor:clockColor]];
+}
 
+- (void)dealloc {
+	%orig;
+	[plist release];
 	[dt release];
 }
 
