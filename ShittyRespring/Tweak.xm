@@ -3,6 +3,7 @@
 
 // Thanks to iHeli0s and SBBrightness source, for reminding me where to put stuff and save me from a dump search.
 // has a bug with FolderEnhancer... Although I doubt anyone will be using this tweak so... Who cares? :D
+// also rotation on the iPad?... Works in a shitty way (my fault, was too lazy and saw no need to make that amazing)
 
 #import <UIKit/UIKit.h>
 static UIButton *btn;
