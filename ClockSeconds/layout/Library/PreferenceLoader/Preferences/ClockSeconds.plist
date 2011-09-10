@@ -29,6 +29,8 @@
             <string>SecondsEnabled</string>
             <key>label</key>
             <string>Seconds Enabled</string>
+            <key>PostNotification</key>
+            <string>com.abart997.clockseconds.settingschangd</string>
          </dict>
          
          <dict>
@@ -42,6 +44,8 @@
             <string>ColorEnabled</string>
             <key>label</key>
             <string>Color Enabled</string>
+            <key>PostNotification</key>
+            <string>com.abart997.clockseconds.settingschangd</string>
          </dict>
 		
 		<dict>
@@ -77,6 +81,8 @@
 				<string>6</string>
 				<string>7</string>
 			</array>
+			<key>PostNotification</key>
+            <string>com.abart997.clockseconds.settingschangd</string>
 		</dict>
 		
 		<dict>
