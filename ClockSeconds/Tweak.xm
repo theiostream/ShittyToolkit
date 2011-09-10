@@ -31,7 +31,7 @@ static NSInteger clockColor;
 		
 		if ([[plist objectForKey:@"SecondsEnabled"] boolValue]) {
 			NSTimer *dateTimer = MSHookIvar<NSTimer *>(self, "_dateTimer");
-			id userInfo = [[dateTimer userInfo] copy];
+			id userInfo = [[[dateTimer userInfo] copy] autorelease];
 			[dateTimer invalidate];
 			[dateTimer release];
 			dateTimer = [NSTimer scheduledTimerWithTimeInterval:1 target:self selector:@selector(updateClock) userInfo:userInfo repeats:YES];

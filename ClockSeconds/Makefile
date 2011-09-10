@@ -1,3 +1,4 @@
+SDKVERSION=4.3
 THEOS_DEVICE_IP=192.168.1.106
 
 include theos/makefiles/common.mk
