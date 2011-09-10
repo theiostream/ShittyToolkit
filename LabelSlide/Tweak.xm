@@ -44,7 +44,7 @@ NSTimer *timer = nil;
 		if (valued) {
 			[dt setDateFormat:@"dd-MM-YYYY"]; }
 		else if (valuet) { // prefer date over time
-			if (!timer) timer = [NSTimer scheduledTimerWithTimeInterval:1 target:self selector:@selector(run) userInfo:nil repeats:YES];
+			if (!timer) timer = [[NSTimer scheduledTimerWithTimeInterval:1 target:self selector:@selector(run) userInfo:nil repeats:YES] retain];
 		}
 			
 		NSString *date = [dt stringFromDate:[NSDate date]];
@@ -59,7 +59,6 @@ NSTimer *timer = nil;
 - (void)dealloc {
 	%orig;
 	[timer invalidate];
-	[timer release];
 }
 
 %new(v@:)
