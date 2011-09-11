@@ -1,0 +1,10 @@
+{
+    entry = {
+	bundle = folderlockfreesettings;
+	cell = PSLinkCell;
+	detail = folderlockfreesettingsListController;
+	icon = folderlockfreesettings.png;
+	isController = 1;
+	label = FolderLock;
+    };
+}
