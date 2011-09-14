@@ -2,12 +2,11 @@
 Code by abart997
 Working better thanks to theiostream (prefs + nonstop timer)
 Ugly, but works. (also less ugly than my first version was) -- check commit history
-Still, it shouldn't get so much of your memory as it is only executed while on the LockScreen
+Still, it shouldn't get so much of your memory as it is only executed while on the LockScreen (maybe...?)
 */
 
-// TODO: fix mem leaks on dateTimer and userInfo
-// although it shouldn't get so much mem as it's lockscreen only. it also deallocs most stuff.
-// message me your contributions, and also any other mem leak that you find.
+// TODO: fix mem leaks on dateTimer (it will keep runnin and runnin)
+// Do CFNotificationCenterAddObserver()
 
 #import <UIKit/UIKit.h>
 #import <objc/runtime.h>
@@ -45,9 +44,6 @@ static NSInteger clockColor;
 
 	%orig;
 	
-	if (![[plist objectForKey:@"SecondsEnabled"] boolValue])
-		return;
-	
 	TPLCDTextView *time = MSHookIvar<TPLCDTextView *>(self, "_timeLabel");
 	
 	if (dt==nil) {
@@ -57,11 +53,14 @@ static NSInteger clockColor;
 	[dt setTimeStyle:NSDateFormatterShortStyle];
 	[dt setDateFormat:@"HH:mm:ss"];
 	
-	![[plist objectForKey:@"SecondsEnabled"] boolValue] ? NSLog(@"test") : [time setText:[dt stringFromDate:[NSDate date]]];
-	![[plist objectForKey:@"ColorEnabled"] boolValue] ? NSLog(@"test") : [time setTextColor: [self grabPrefColor:clockColor]];
+	if ([[plist objectForKey:@"SecondsEnabled"] boolValue]) [time setText:[dt stringFromDate:[NSDate date]]];
+	if ([[plist objectForKey:@"ColorEnabled"] boolValue]) [time setTextColor: [self grabPrefColor:clockColor]];
+	// took away syslog flood.
 }
 
 - (void)dealloc {
+	NSLog(@"================= [ClockSeconds] Called -[SBAwayDateView dealloc]");
+	
 	%orig;
 	[plist release];
 	[dt release];
