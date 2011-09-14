@@ -13,6 +13,7 @@ Still, it shouldn't get so much of your memory as it is only executed while on t
 
 static NSMutableDictionary *plist = nil;
 static NSDateFormatter *dt = nil;
+static BOOL mustReleaseFormatter = NO;
 
 @interface TPLCDTextView : UIView { }
 -(void)setText:(id)text;
@@ -28,7 +29,8 @@ static NSInteger clockColor;
 		if (!plist)
 			plist = [[NSMutableDictionary alloc] initWithContentsOfFile:@"/var/mobile/Library/Preferences/com.abart997.clockseconds.plist"];
 		
-		if ([[plist objectForKey:@"SecondsEnabled"] boolValue]) {
+		if ([[plist objectForKey:@"SecondsEnabled"] boolValue]||[[plist objectForKey:@"ColorEnabled"] boolValue]) {
+			mustReleaseFormatter = YES;
 			NSTimer *dateTimer = MSHookIvar<NSTimer *>(self, "_dateTimer");
 			id userInfo = [[[dateTimer userInfo] copy] autorelease];
 			[dateTimer invalidate];
@@ -63,7 +65,7 @@ static NSInteger clockColor;
 	
 	%orig;
 	[plist release];
-	[dt release];
+	if (mustReleaseFormatter) { [dt release]; mustReleaseFormatter = NO; }
 }
 
 %new(v@:i)
