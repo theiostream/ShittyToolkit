@@ -47,7 +47,7 @@ static BOOL itsok = YES;
 	[btn release];
 }
 
-%new(v@:)
+%new
 - (void)setFrameForButton:(UIButton *)ok {
 	if ([[UIDevice currentDevice] isWildcat]) {
 		if([UIDevice currentDevice].orientation == UIDeviceOrientationPortrait) {
@@ -62,14 +62,15 @@ static BOOL itsok = YES;
 	}
 }
 
-%new(v@:@@)
+%new
 - (void)changeName:(id)button {
 	[button setTitle:@"Done..." forState:UIControlStateNormal];
 	itsok = NO;
 }
 
-%new(v@:)
+%new
 -(void)respring {
+	NSLog(@"[ShittyRespring] Respringing...");
 	itsok = YES;
 	system("killall -9 SpringBoard"); // this is just fine.
 }
