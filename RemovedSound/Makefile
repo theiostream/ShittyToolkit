@@ -5,5 +5,5 @@ include theos/makefiles/common.mk
 
 TWEAK_NAME = RemovedSound
 RemovedSound_FILES = Tweak.xm
-RemovedSound_FRAMEWORKS = UIKit AVFoundation
+RemovedSound_FRAMEWORKS = UIKit AVFoundation AudioToolbox
 include $(THEOS_MAKE_PATH)/tweak.mk

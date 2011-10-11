@@ -1,5 +1,6 @@
 #import <UIKit/UIKit.h>
-#import <AVFoundation/AVFoundation.h>
+#import <CoreFoundation/CoreFoundation.h>
+#include <AudioToolbox/AudioToolbox.h>
 
 #define TRASH_PATH @"/var/mobile/Library/RemovedApp/emptytrash.aif"
 
@@ -8,7 +9,7 @@ static BOOL values;
 static BOOL valuet;
 static NSMutableDictionary *plist = nil;
 
-AVAudioPlayer *audioPlayer;
+SystemSoundID sound;
 
 static void loadPrefs() {
 	if (!plist) plist = [[NSMutableDictionary alloc] initWithContentsOfFile:@"/var/mobile/Library/Preferences/com.abart997.removedapp.plist"];
@@ -19,75 +20,29 @@ static void loadPrefs() {
 
 %hook SBDeleteIconAlertItem
 -(void)alertView:(id)view clickedButtonAtIndex:(int)index{
-
-	if(!value){
-		return %orig;
-	}
-	
-	else if (value){
-
-		if(index == 0){
-			%orig;
-			NSURL *url = [NSURL fileURLWithPath:[NSString stringWithFormat:TRASH_PATH]];
-        	audioPlayer = [[[AVAudioPlayer alloc] initWithContentsOfURL:url error:nil] retain];
-        	audioPlayer.numberOfLoops = 0;
-			audioPlayer.volume = 1.0;
-			[audioPlayer play];
-		}
-	}
-}
-
-- (void)dealloc {
 	%orig;
-	[audioPlayer release];
+	if (value)
+		if (index == 0)
+			AudioServicesPlaySystemSound(sound);
 }
 %end
 
 
 %hook MailboxContentViewController
 -(void)_reallyDeleteMessages:(id)messages{
-
-	if(!values){
-		return %orig;
-	}
-	else if (values){
-		%orig;
-		NSURL *url = [NSURL fileURLWithPath:[NSString stringWithFormat:TRASH_PATH]];
-        audioPlayer = [[AVAudioPlayer alloc] initWithContentsOfURL:url error:nil];
-        audioPlayer.numberOfLoops = 0;
-		audioPlayer.volume = 1.0;
-		[audioPlayer play];
-	}
-}
-
-- (void)dealloc {
 	%orig;
-	[audioPlayer release];
+	if (values) AudioServicesPlaySystemSound(sound);
 }
 %end
 
 %hook NotesDisplayController
 
 -(void)actionSheet:(id)sheet clickedButtonAtIndex:(int)index{
-
-	if(!valuet){
-		return %orig;
-	}
-	else if (valuet){
-		if(index == 0){
-			%orig;
-			NSURL *url = [NSURL fileURLWithPath:[NSString stringWithFormat:TRASH_PATH]];
-        	audioPlayer = [[AVAudioPlayer alloc] initWithContentsOfURL:url error:nil];
-        	audioPlayer.numberOfLoops = 0;
-			audioPlayer.volume = 1.0;
-			[audioPlayer play];
-		}
-	}
-}	
-
-- (void)dealloc {
 	%orig;
-	[audioPlayer release];
+	
+	if (valuet)
+		if (index == 0)
+			AudioServicesPlaySystemSound(sound);
 }
 %end
 
@@ -99,7 +54,15 @@ static void SettingsChanged() {
 %ctor {
 	NSAutoreleasePool *p = [[NSAutoreleasePool alloc] init];
 	%init;
+	
+	// setup prefs
 	CFNotificationCenterAddObserver(CFNotificationCenterGetDarwinNotifyCenter(), NULL, (CFNotificationCallback)&SettingsChanged, CFSTR("com.abart997.removedapp/ReloadPrefs"), NULL, CFNotificationSuspensionBehaviorHold);
 	SettingsChanged();
+	
+	// setup audioplayer
+	NSURL *filePath = [NSURL fileURLWithPath:TRASH_PATH isDirectory:NO];
+	AudioServicesCreateSystemSoundID((CFURLRef)filePath, &sound);
+	
+	
 	[p drain];
 }
