@@ -1,3 +1,13 @@
+// THIS IS A CLONE OF PAID SOFTWARE.
+// THE AUTHOR CHOSE NOT TO REDISTRIBUTE THIS PACKAGE, EVEN IF THAT COULD BE DONE LEGALLY AS IT'S WRITTEN COMPLETELY BY HIM.
+// YOU ARE NOT ALLOWED TO REDISTRIBUTE; AS FREE OR PAID PACKAGE IN ANY WAY.
+
+// FolderLockFree (c) 2011 Matoe Productions LLC
+// Special thanks to Maximus.
+
+// TODO: Too lazy to use Apple's methods for inserting TextFields...
+//       Do that; or use TIAlertView (http://github.com/theiostream/TIKit)
+
 #import <UIKit/UIKit.h>
 
 static NSMutableDictionary *dict = nil;
